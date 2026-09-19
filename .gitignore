@@ -1,0 +1,5 @@
+.DS_Store
+node_modules/
+demo/captures/
+demo/*.mp4
+demo/*.mov

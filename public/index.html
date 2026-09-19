@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#09111f" />
+    <meta name="description" content="PhishLens helps students and school communities inspect suspicious messages before they click." />
+    <title>PhishLens — Explain first. Click later.</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-one" aria-hidden="true"></div>
+    <div class="ambient ambient-two" aria-hidden="true"></div>
+
+    <header class="site-header shell">
+      <a class="brand" href="/" aria-label="PhishLens home">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span>Phish<span class="brand-accent">Lens</span></span>
+      </a>
+      <div class="header-meta">
+        <span class="status-dot"></span>
+        <span>student safety assistant</span>
+        <span class="header-divider" aria-hidden="true"></span>
+        <span>local-first</span>
+      </div>
+    </header>
+
+    <main class="shell page-grid">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="eyebrow"><span class="eyebrow-line"></span>PhishLens for school communities</div>
+        <h1 id="hero-title">See the signals<br /><em>before the scam</em> sees you.</h1>
+        <p class="hero-copy">A calm safety layer for students, families, and school staff. Inspect the sender, the story, and the destination—without opening a single link.</p>
+        <div class="hero-proof" aria-label="Product promises">
+          <div class="proof-item"><strong>01</strong><span>Inspect identity and pressure tactics</span></div>
+          <div class="proof-item"><strong>02</strong><span>Understand observable evidence</span></div>
+          <div class="proof-item"><strong>03</strong><span>Leave with a safe report and next move</span></div>
+        </div>
+        <div class="hero-note">
+          <span class="note-icon" aria-hidden="true">✦</span>
+          <span>Local evidence analysis is always available. The optional AI review stays on this device through Ollama when it is enabled.</span>
+        </div>
+      </section>
+
+      <section class="analyzer-card" aria-labelledby="analyzer-title">
+        <div class="card-topline">
+          <div>
+            <div class="section-kicker">Message + identity scanner</div>
+            <h2 id="analyzer-title">What did you receive?</h2>
+          </div>
+          <div class="privacy-pill"><span aria-hidden="true">◉</span> No links opened. Nothing stored.</div>
+        </div>
+
+        <div class="context-grid" aria-label="Message context">
+          <label class="field-control">I am a
+            <select id="profile-input">
+              <option>Student</option>
+              <option>Parent / caregiver</option>
+              <option>School staff</option>
+              <option>General user</option>
+            </select>
+          </label>
+          <label class="field-control">Received via
+            <select id="channel-input">
+              <option>Email</option>
+              <option>Text message</option>
+              <option>Chat</option>
+              <option>Other</option>
+            </select>
+          </label>
+          <label class="field-control">Sender (optional)
+            <input id="sender-input" type="text" autocomplete="off" placeholder="security@example.edu" maxlength="160" />
+          </label>
+          <label class="field-control">Claimed organization (optional)
+            <input id="brand-input" type="text" autocomplete="off" placeholder="School, Microsoft, FedEx…" maxlength="80" />
+          </label>
+        </div>
+
+        <div class="sample-row" aria-label="Load a safe demo message">
+          <span class="sample-label">Try a scenario</span>
+          <button class="sample-chip" type="button" data-sample="school">School account</button>
+          <button class="sample-chip" type="button" data-sample="delivery">Package text</button>
+          <button class="sample-chip" type="button" data-sample="voice">Voice-clone bait</button>
+          <button class="sample-chip" type="button" data-sample="reward">Reward bait</button>
+          <button class="sample-chip" type="button" data-sample="safe">Safe message</button>
+        </div>
+
+        <label class="sr-only" for="message-input">Paste a suspicious message</label>
+        <div class="textarea-wrap">
+          <textarea id="message-input" maxlength="4000" spellcheck="true" placeholder="Paste an email, text message, or chat here…">URGENT: Your student account will be suspended within 30 minutes. Verify your password immediately at https://account-verify.example/login or reply with your one-time code. Do not tell anyone until this is resolved.</textarea>
+          <div class="textarea-footer"><span id="char-count">0 / 4,000</span><span>Message stays on this device</span></div>
+        </div>
+
+        <div class="action-row">
+          <button class="primary-button" id="analyze-button" type="button"><span class="button-icon" aria-hidden="true">⌁</span> Analyze safely</button>
+          <button class="ghost-button" id="clear-button" type="button">Clear</button>
+          <span class="action-status" id="action-status" role="status" aria-live="polite"></span>
+        </div>
+      </section>
+
+      <section class="results-area" id="results-area" aria-live="polite" aria-busy="false">
+        <div class="results-header">
+          <div>
+            <div class="section-kicker">Your safety readout</div>
+            <h2>Make the next move with evidence.</h2>
+          </div>
+          <div class="scan-badge"><span class="badge-dot"></span><span id="scan-mode">Local analysis ready</span></div>
+        </div>
+
+        <div class="result-grid">
+          <article class="score-card result-card">
+            <div class="card-label">Risk signal</div>
+            <div class="score-layout">
+              <div class="score-ring" id="score-ring" style="--score: 88deg"><div class="score-ring-inner"><strong id="score-value">88</strong><span>/ 100</span></div></div>
+              <div>
+                <div class="risk-label high" id="risk-label">High risk</div>
+                <p id="risk-summary">Several social-engineering signals are stacked together.</p>
+                <div class="confidence"><span>evidence coverage</span><strong id="evidence-value">4 observed factors</strong></div>
+              </div>
+            </div>
+            <p class="triage-note" id="triage-note">This is a safety recommendation, not proof of fraud.</p>
+            <div class="score-scale"><span>lower risk</span><span>review</span><span>high risk</span></div>
+          </article>
+
+          <article class="next-card result-card">
+            <div class="card-label">Safe next move</div>
+            <div class="next-heading"><span class="shield-icon" aria-hidden="true">✓</span><h3>Slow the story down.</h3></div>
+            <ul class="step-list" id="safe-steps"></ul>
+          </article>
+        </div>
+
+        <div class="detail-grid">
+          <article class="evidence-card result-card">
+            <div class="card-heading-row"><div><div class="card-label">Evidence trail</div><h3>Why PhishLens flagged it</h3></div><span class="count-badge" id="signal-count">5 signals</span></div>
+            <div class="signal-list" id="signal-list"></div>
+          </article>
+
+          <aside class="reply-card result-card">
+            <div class="card-label">A response you can use</div>
+            <h3>Protect your future self.</h3>
+            <p class="reply-copy" id="safe-reply"></p>
+            <div class="report-buttons">
+              <button class="copy-button" id="copy-button" type="button"><span aria-hidden="true">▣</span> Copy safe response</button>
+              <button class="copy-button secondary-action" id="report-button" type="button"><span aria-hidden="true">⇩</span> Download safe report</button>
+            </div>
+            <p class="report-status" id="report-status">A report is generated locally and never sent automatically.</p>
+            <div class="privacy-checks">
+              <div><span>✓</span><span>No links opened</span></div>
+              <div><span>✓</span><span>No message sent</span></div>
+              <div><span>✓</span><span>No data stored</span></div>
+            </div>
+          </aside>
+        </div>
+
+        <article class="message-card result-card">
+          <div class="card-heading-row"><div><div class="card-label">Message anatomy</div><h3>See the pressure points</h3></div><span class="scan-stat" id="link-stat">0 links found</span></div>
+          <div class="anatomy-layout">
+            <div class="message-preview" id="message-preview"></div>
+            <div class="link-panel"><div class="mini-label">Link handling</div><div id="url-list" class="url-list"></div></div>
+          </div>
+        </article>
+
+        <div class="insight-grid">
+          <article class="ai-card result-card">
+            <div class="card-heading-row"><div><div class="card-label">Optional local AI review</div><h3>A second, semantic opinion</h3></div><span class="ai-state" id="ai-state">ready when you are</span></div>
+            <p class="ai-summary" id="ai-summary">Run a local Ollama review to look for meaning-level persuasion patterns that complement the explainable evidence engine.</p>
+            <ul class="ai-observations" id="ai-observations"><li>Input stays local when Ollama is available.</li><li>Model output is never treated as a verdict.</li></ul>
+            <button class="ai-button" id="ai-review-button" type="button">Run local AI second opinion</button>
+            <p class="ai-caveat" id="ai-caveat">If no local model is available, PhishLens keeps the deterministic evidence analysis fully usable.</p>
+          </article>
+
+          <article class="resilience-card result-card">
+            <div class="card-label">Modern-scam resilience</div>
+            <h3>Look beyond a single wording.</h3>
+            <p>Instead of generating usable scam text, PhishLens explains which danger signals would still survive a cosmetic rewrite.</p>
+            <ul class="resilience-list" id="resilience-list"></ul>
+          </article>
+        </div>
+
+        <article class="evaluation-card result-card">
+          <div><div class="card-label">Quality proof</div><h3>Test the safety engine before you trust it.</h3><p>A transparent regression suite checks the expected behavior of phishing, impersonation, payment, and benign school scenarios. It is not presented as a real-world accuracy benchmark.</p></div>
+          <div class="evaluation-action"><button class="eval-button" id="evaluation-button" type="button">Run 24-case safety check</button><strong id="evaluation-status">Not run in this session</strong></div>
+          <div class="evaluation-details" id="evaluation-details" hidden></div>
+        </article>
+      </section>
+
+      <section class="how-it-works" aria-labelledby="how-title">
+        <div><div class="section-kicker">The PhishLens promise</div><h2 id="how-title">A calm layer between<br />you and the click.</h2></div>
+        <div class="promise-grid">
+          <div class="promise"><span class="promise-number">01</span><h3>Explainable</h3><p>Every alert points to visible evidence, not a black-box probability.</p></div>
+          <div class="promise"><span class="promise-number">02</span><h3>Safe by design</h3><p>Messages are analyzed locally. Links stay unopened until the person decides what to do.</p></div>
+          <div class="promise"><span class="promise-number">03</span><h3>Actionable</h3><p>Leave with a safer next move and a privacy-preserving report—not just a warning badge.</p></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer shell"><span>PhishLens</span><span>Explain first. Click later.</span><span>Prototype for TLN Cybersecurity Challenge 2026</span></footer>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

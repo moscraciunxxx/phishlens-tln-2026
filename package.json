@@ -1,0 +1,14 @@
+{
+  "name": "phishlens",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Explainable, offline-first phishing and scam analysis demo for the TLN Cybersecurity Challenge.",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.mjs",
+    "start": "node server.mjs",
+    "check": "node --check server.mjs && node --check src/analysis.mjs && node --check src/ai.mjs && node --check public/engine.mjs && node --check public/app.js",
+    "test": "node --test test/*.test.mjs",
+    "evaluate": "node --input-type=module -e \"import { runScenarioEvaluation } from './src/analysis.mjs'; console.log(JSON.stringify(runScenarioEvaluation(), null, 2))\""
+  }
+}
