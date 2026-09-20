@@ -10,6 +10,7 @@
 - [x] Screenshot/QR inspection path and pasted SPF/DKIM/DMARC context with caveats.
 - [x] Deterministic-versus-AI comparison, multilingual/adversarial regression coverage, and accessibility controls.
 - [x] Consent-first redacted school handoff, ethical pilot mode, and 90-second judge flow.
+- [ ] Run at least one explicitly consented human pilot session and report its descriptive measures; do not substitute synthetic regression metrics.
 - [x] Visible 36-case deterministic safety dataset with precision/recall/false-positive reporting.
 - [x] Under-five-minute demo script and Devpost-ready narrative.
 - [x] Local checks: `npm run check`, `npm test`, and `npm run evaluate`.

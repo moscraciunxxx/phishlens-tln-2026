@@ -529,3 +529,25 @@ export const PILOT_PROTOCOL = {
   ],
   protocol: "Use only synthetic or participant-provided messages with explicit consent. Record anonymous event timings and ratings locally, then export a summary for review. Do not collect names, contact details, or original messages."
 };
+
+export function summarizePilotEvents(events = []) {
+  const safeEvents = Array.isArray(events)
+    ? events.filter((event) => event && typeof event.type === "string" && Number.isFinite(event.elapsedMs))
+      .map((event) => ({ type: event.type, elapsedMs: Math.max(0, Math.round(event.elapsedMs)) }))
+    : [];
+  const outcomes = safeEvents.filter((event) => ["independent_verification", "false_alarm_feedback"].includes(event.type));
+  const independentVerification = outcomes.filter((event) => event.type === "independent_verification").length;
+  const feedback = outcomes.filter((event) => event.type === "false_alarm_feedback").length;
+  const times = outcomes.map((event) => event.elapsedMs);
+  return {
+    participantCount: 1,
+    outcomeCount: outcomes.length,
+    independentVerificationCount: independentVerification,
+    feedbackCount: feedback,
+    independentVerificationRate: outcomes.length ? Number((independentVerification / outcomes.length).toFixed(3)) : null,
+    averageTimeToOutcomeMs: times.length ? Math.round(times.reduce((sum, value) => sum + value, 0) / times.length) : null,
+    outcomes,
+    rawMessagesStored: false,
+    limitation: "Local dogfood session only; this is not a representative user study. Run additional consented sessions before making population-level claims."
+  };
+}

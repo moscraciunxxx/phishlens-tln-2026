@@ -5,6 +5,7 @@ export {
   runDatasetEvaluation,
   compareReviews,
   parseEmailHeaders,
+  summarizePilotEvents,
   EVALUATION_SCENARIOS,
   ADVERSARIAL_SCENARIOS,
   PILOT_PROTOCOL

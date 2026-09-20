@@ -82,6 +82,7 @@ By default, PhishLens calls `http://127.0.0.1:11434/api/generate`. Set `PHISHLEN
 
 - [Devpost-ready write-up](DEVPOST_SUBMISSION.md)
 - [under-five-minute demo script](DEMO_SCRIPT.md)
+- [Ethical pilot status and measures](PILOT_REPORT.md)
 - [Pre-submission checklist](LAUNCH_CHECKLIST.md)
 
 ### Static deployment

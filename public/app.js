@@ -3,7 +3,8 @@ import {
   compareReviews,
   PILOT_PROTOCOL,
   reportText,
-  runDatasetEvaluation
+  runDatasetEvaluation,
+  summarizePilotEvents
 } from "./engine.mjs";
 
 const samples = {
@@ -449,16 +450,11 @@ function exportPilotSummary() {
     pilotStatus.textContent = "Start a consented pilot session first.";
     return;
   }
-  const outcomes = pilotSession.events.filter((event) => ["independent_verification", "false_alarm_feedback"].includes(event.type));
-  const times = outcomes.map((event) => event.elapsedMs);
+  const pilotMetrics = summarizePilotEvents(pilotSession.events);
   const summary = {
     protocol: PILOT_PROTOCOL,
     generatedAt: new Date().toISOString(),
-    participantCount: 1,
-    outcomeCount: outcomes.length,
-    averageTimeToOutcomeMs: times.length ? Math.round(times.reduce((sum, value) => sum + value, 0) / times.length) : null,
-    outcomes: outcomes.map((event) => ({ type: event.type, elapsedMs: event.elapsedMs })),
-    limitation: "Local dogfood session only; this is not a representative user study. Run additional consented sessions before making population-level claims."
+    ...pilotMetrics
   };
   downloadText("phishlens-pilot-summary.json", JSON.stringify(summary, null, 2), "application/json;charset=utf-8");
   pilotStatus.textContent = "Anonymous pilot summary exported locally. No original message content was included.";

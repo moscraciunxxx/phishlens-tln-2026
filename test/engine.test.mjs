@@ -7,7 +7,8 @@ import {
   parseEmailHeaders,
   reportText,
   runDatasetEvaluation,
-  runScenarioEvaluation
+  runScenarioEvaluation,
+  summarizePilotEvents
 } from "../src/analysis.mjs";
 
 test("high-risk credential scam produces traceable evidence without opening links", () => {
@@ -77,4 +78,19 @@ test("AI comparison keeps the deterministic engine primary", () => {
   assert.deepEqual(comparison.sharedSignals.sort(), ["credential"]);
   assert.deepEqual(comparison.aiOnly.sort(), ["link"]);
   assert.match(comparison.note, /primary safety trace/i);
+});
+
+test("pilot summarizer exports anonymous measurable outcomes only", () => {
+  const summary = summarizePilotEvents([
+    { type: "pilot_started", elapsedMs: 0, message: "must never leave the UI" },
+    { type: "independent_verification", elapsedMs: 4200 },
+    { type: "false_alarm_feedback", elapsedMs: 6800 }
+  ]);
+  assert.equal(summary.participantCount, 1);
+  assert.equal(summary.outcomeCount, 2);
+  assert.equal(summary.independentVerificationRate, 0.5);
+  assert.equal(summary.averageTimeToOutcomeMs, 5500);
+  assert.equal(summary.rawMessagesStored, false);
+  assert.ok(!JSON.stringify(summary).includes("must never leave the UI"));
+  assert.match(summary.limitation, /not a representative user study/i);
 });
