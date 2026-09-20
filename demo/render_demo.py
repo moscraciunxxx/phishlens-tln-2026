@@ -36,16 +36,16 @@ def main():
 
         # Scene 1: purpose and privacy promise.
         page.evaluate("window.scrollTo(0, 0)")
-        hold(page, 7000)
+        hold(page, 15000)
 
         # Scene 2: explainable outcome and suggested safe move.
         page.locator("#analyze-button").click()
-        hold(page, 2000)
-        hold(page, 8500)
+        hold(page, 8000)
+        hold(page, 15000)
 
         # Scene 3: literal evidence and locally parsed link.
         page.locator(".message-card").scroll_into_view_if_needed()
-        hold(page, 8500)
+        hold(page, 15000)
 
         # Scene 4: optional local semantic review.
         page.locator("#ai-review-button").click()
@@ -56,22 +56,22 @@ def main():
                 page.get_by_text("evidence fallback", exact=True).wait_for(timeout=5000)
             except Exception:
                 pass
-        hold(page, 7000)
+        hold(page, 12000)
 
         # Scene 5: transparent behavior regression check and judge proof.
         page.locator("#evaluation-button").click()
         hold(page, 1000)
         page.locator(".evaluation-card").scroll_into_view_if_needed()
-        hold(page, 8000)
+        hold(page, 15000)
 
         # Scene 6: one guided, judge-operable flow.
         page.locator("#judge-mode-button").click()
         page.get_by_text("judge proof ready", exact=False).wait_for(timeout=10000)
-        hold(page, 5000)
+        hold(page, 14000)
 
         # Scene 7: product promise.
         page.locator(".how-it-works").scroll_into_view_if_needed()
-        hold(page, 6000)
+        hold(page, 12000)
 
         page.close()
         context.close()

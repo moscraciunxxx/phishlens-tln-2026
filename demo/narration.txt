@@ -1,9 +1,13 @@
 Phishing succeeds when a message pressures someone to act before they can check it. PhishLens is a calm layer between a suspicious message and a risky click.
 
-Here, a student can paste or choose a message and inspect the sender, claimed organization, and channel. The analysis makes the pressure visible: urgency, a request for credentials, impersonation cues, secrecy, and a destination that does not match the claimed organization. The link is parsed locally, never opened.
+A student can paste or choose a message and inspect the sender, claimed organization, and channel. The analysis makes the pressure visible: urgency, a request for credentials, impersonation cues, secrecy, and a destination that does not match the claimed organization. Links are parsed locally and never opened.
 
-PhishLens shows observed factors, not a misleading confidence percentage. It then gives a practical next move: use an official route, ask a trusted adult or school contact, and save a redacted local report if needed.
+The advanced evidence panel handles harder cases without sending the content anywhere. Users can paste email authentication headers, preview a screenshot, decode a QR value when the browser supports it, or supply visible screenshot text. PhishLens surfaces encoded destinations, unusual ports, look-alike domains, and the limits of reported SPF, DKIM, and DMARC results.
 
-For a second perspective, the product can ask a local Ollama model for constrained defensive triage. The deterministic evidence engine still works when that model is unavailable.
+PhishLens shows observed factors, not a misleading confidence percentage. It gives a practical next move: use an official route, ask a trusted adult or school contact, and save a redacted local report if needed.
 
-Finally, the interface exposes a 24-case safety regression check. It is a transparent behavior check, not a claim of real-world model accuracy. PhishLens helps people slow down, understand the pressure, and take a safer next step.
+For a second perspective, the product can ask a local Ollama model for constrained defensive triage. The comparison panel makes shared, engine-only, and AI-only signals visible. The deterministic evidence engine still works when that model is unavailable.
+
+The 36-case safety dataset includes benign, multilingual, misspelled, QR and image-text, header, and adversarial behavior checks. It reports transparent metrics for this synthetic set, not real-world accuracy. A consent-first handoff, accessibility controls, and a local ethical pilot keep the workflow practical and honest.
+
+Run 90-second judge mode to replay the proof: evidence, a redacted safe report, and behavior metrics. PhishLens helps people slow down, understand the pressure, and take a safer next step.
