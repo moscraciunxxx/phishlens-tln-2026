@@ -75,6 +75,35 @@
           </label>
         </div>
 
+        <details class="advanced-panel">
+          <summary>Inspect more evidence safely <span>headers · screenshots · QR codes</span></summary>
+          <div class="advanced-grid">
+            <label class="field-control field-wide">Paste email authentication headers (optional)
+              <textarea id="headers-input" class="compact-textarea" maxlength="12000" spellcheck="false" placeholder="Authentication-Results: ... spf=pass dkim=pass dmarc=pass"></textarea>
+            </label>
+            <div class="upload-control">
+              <label class="field-control">Screenshot or QR image (optional)
+                <input id="screenshot-input" type="file" accept="image/*" />
+              </label>
+              <img id="screenshot-preview" class="screenshot-preview" alt="Local screenshot preview" hidden />
+              <p id="screenshot-status" class="micro-status">No image selected. Images are inspected in this browser and are not uploaded.</p>
+            </div>
+            <label class="field-control field-wide">QR value or screenshot text (optional)
+              <textarea id="qr-value-input" class="compact-textarea" maxlength="2000" spellcheck="false" placeholder="Paste decoded QR text or visible screenshot text here"></textarea>
+            </label>
+          </div>
+        </details>
+
+        <div class="accessibility-panel" aria-label="Accessibility controls">
+          <span class="mini-label">Make the readout work for you</span>
+          <label class="inline-control">Reading level
+            <select id="reading-level-input"><option value="plain">Plain language</option><option value="standard">Standard</option></select>
+          </label>
+          <label class="inline-control"><input id="large-text-toggle" type="checkbox" /> Larger text</label>
+          <label class="inline-control"><input id="high-contrast-toggle" type="checkbox" /> High contrast</label>
+          <label class="inline-control"><input id="reduce-motion-toggle" type="checkbox" /> Reduce motion</label>
+        </div>
+
         <div class="sample-row" aria-label="Load a safe demo message">
           <span class="sample-label">Try a scenario</span>
           <button class="sample-chip" type="button" data-sample="school">School account</button>
@@ -93,8 +122,10 @@
         <div class="action-row">
           <button class="primary-button" id="analyze-button" type="button"><span class="button-icon" aria-hidden="true">⌁</span> Analyze safely</button>
           <button class="ghost-button" id="clear-button" type="button">Clear</button>
+          <button class="ghost-button judge-button" id="judge-mode-button" type="button">Run 90-second judge mode</button>
           <span class="action-status" id="action-status" role="status" aria-live="polite"></span>
         </div>
+        <p class="judge-status" id="judge-status" role="status" aria-live="polite">Judge mode walks through one representative case, the safe report, and the test metrics.</p>
       </section>
 
       <section class="results-area" id="results-area" aria-live="polite" aria-busy="false">
@@ -159,6 +190,20 @@
           </div>
         </article>
 
+        <div class="evidence-addons">
+          <article class="addon-card result-card" id="header-analysis" hidden>
+            <div class="card-label">Email authentication context</div>
+            <h3>What the pasted headers report</h3>
+            <ul class="header-list" id="header-list"></ul>
+            <p class="addon-caveat" id="header-caveat"></p>
+          </article>
+          <article class="addon-card result-card" id="qr-analysis" hidden>
+            <div class="card-label">Screenshot / QR inspection</div>
+            <h3>Image evidence stayed local.</h3>
+            <p class="addon-caveat" id="qr-analysis-text"></p>
+          </article>
+        </div>
+
         <div class="insight-grid">
           <article class="ai-card result-card">
             <div class="card-heading-row"><div><div class="card-label">Optional local AI review</div><h3>A second, semantic opinion</h3></div><span class="ai-state" id="ai-state">ready when you are</span></div>
@@ -176,10 +221,55 @@
           </article>
         </div>
 
+        <article class="comparison-card result-card" id="comparison-card" hidden>
+          <div class="card-heading-row"><div><div class="card-label">Inspect the second opinion</div><h3>Deterministic engine ↔ local AI</h3></div><span class="ai-state" id="comparison-status">Not compared</span></div>
+          <div class="comparison-grid">
+            <div><span class="mini-label">Shared signals</span><strong id="shared-signals">None surfaced</strong></div>
+            <div><span class="mini-label">Engine only</span><strong id="deterministic-only">None surfaced</strong></div>
+            <div><span class="mini-label">AI only</span><strong id="ai-only">None surfaced</strong></div>
+          </div>
+          <p class="addon-caveat" id="comparison-note"></p>
+        </article>
+
         <article class="evaluation-card result-card">
-          <div><div class="card-label">Quality proof</div><h3>Test the safety engine before you trust it.</h3><p>A transparent regression suite checks the expected behavior of phishing, impersonation, payment, and benign school scenarios. It is not presented as a real-world accuracy benchmark.</p></div>
-          <div class="evaluation-action"><button class="eval-button" id="evaluation-button" type="button">Run 24-case safety check</button><strong id="evaluation-status">Not run in this session</strong></div>
+          <div><div class="card-label">Quality proof</div><h3>Test the safety engine before you trust it.</h3><p>A transparent 36-case dataset includes benign, multilingual, misspelled, image-text, QR, header, and adversarial cases. It reports behavior metrics without pretending to be real-world accuracy.</p></div>
+          <div class="evaluation-action"><button class="eval-button" id="evaluation-button" type="button">Run 36-case safety check</button><strong id="evaluation-status">Not run in this session</strong></div>
           <div class="evaluation-details" id="evaluation-details" hidden></div>
+        </article>
+
+        <div class="workflow-grid">
+          <article class="workflow-card result-card">
+            <div class="card-label">Consent-first school workflow</div>
+            <h3>Share a redacted explanation, not the original.</h3>
+            <p>Choose a trusted recipient and export a local handoff only after consent. PhishLens never sends it for you.</p>
+            <label class="field-control">Recipient
+              <select id="handoff-recipient"><option>Caregiver</option><option>Teacher</option><option>School IT</option></select>
+            </label>
+            <pre class="handoff-preview" id="handoff-preview">Analyze a message to create a redacted handoff preview.</pre>
+            <label class="check-control"><input id="handoff-consent" type="checkbox" /> I have permission to export this redacted report.</label>
+            <button class="copy-button secondary-action" id="handoff-button" type="button" disabled>Export consented handoff</button>
+            <p class="report-status" id="handoff-status">No handoff has been exported.</p>
+          </article>
+
+          <article class="workflow-card result-card">
+            <div class="card-label">Ethical pilot mode</div>
+            <h3>Measure understanding without collecting messages.</h3>
+            <p>Use synthetic or voluntarily supplied content. Only anonymous timing and outcome choices stay in memory.</p>
+            <label class="check-control"><input id="pilot-consent" type="checkbox" /> I consent to this local pilot session.</label>
+            <div class="pilot-actions">
+              <button class="copy-button" id="pilot-start-button" type="button">Start local pilot</button>
+              <button class="copy-button secondary-action" id="pilot-verify-button" type="button" disabled>I would verify independently</button>
+              <button class="copy-button secondary-action" id="pilot-feedback-button" type="button" disabled>Record false-alarm feedback</button>
+              <button class="copy-button secondary-action" id="pilot-export-button" type="button" disabled>Export anonymous summary</button>
+            </div>
+            <p class="report-status" id="pilot-status">No pilot session started. No original message will be included in the export.</p>
+          </article>
+        </div>
+
+        <article class="judge-proof result-card" id="judge-proof" hidden>
+          <div class="card-label">Presentation proof</div>
+          <h3>One calm flow a judge can operate.</h3>
+          <p>Judge mode loads a representative school case, reveals the evidence trail, prepares a redacted report, and runs the adversarial behavior dataset in one guided path.</p>
         </article>
       </section>
 

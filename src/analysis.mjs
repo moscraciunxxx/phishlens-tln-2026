@@ -1,1 +1,11 @@
-export { analyzePayload, reportText, runScenarioEvaluation, EVALUATION_SCENARIOS } from "../public/engine.mjs";
+export {
+  analyzePayload,
+  reportText,
+  runScenarioEvaluation,
+  runDatasetEvaluation,
+  compareReviews,
+  parseEmailHeaders,
+  EVALUATION_SCENARIOS,
+  ADVERSARIAL_SCENARIOS,
+  PILOT_PROTOCOL
+} from "../public/engine.mjs";

@@ -6,8 +6,9 @@ const SIGNAL_DEFINITIONS = [
     weight: 22,
     patterns: [
       /within\s+\d+\s*(?:minutes?|hours?)/i,
-      /immediately|urgent|act now|last warning|final notice|expires? today|suspended|lose access/i,
-      /before\s+(?:it is\s+)?too late/i
+      /immediately|urgent|act now|last warning|final notice|expires? today|suspended|lose access|inmediatamente|immédiatement|ahora|maintenant/i,
+      /before\s+(?:it is\s+)?too late/i,
+      /urg(?:e|a)nt|immediat(?:e|ely)|act\s+n[o0]w/i
     ],
     explain: "The message compresses your decision time. Scammers use urgency to discourage independent verification."
   },
@@ -17,10 +18,10 @@ const SIGNAL_DEFINITIONS = [
     icon: "key",
     weight: 25,
     patterns: [
-      /password|passcode|one[- ]time code|otp|sign[- ]?in|log\s*in|verify (?:your|the) (?:account|identity)/i,
-      /account information|bank details|routing number/i,
+      /password|passcode|one[- ]time code|otp|sign[- ]?in|log\s*in|verify (?:your|the) (?:account|identity)|contraseña|senha|mot de passe/i,
+      /account information|bank details|routing number|información de cuenta|informations? du compte/i,
       /confirm (?:your|the) (?:account|details|information)/i,
-      /security check/i
+      /security check|p[a@]ssw[o0]rd/i
     ],
     explain: "The sender is steering you toward account or identity information. Use a known official route instead of a message link."
   },
@@ -31,8 +32,8 @@ const SIGNAL_DEFINITIONS = [
     weight: 18,
     patterns: [
       /help desk|support team|security team|administrator|school office|bank fraud|account team/i,
-      /student account|school account|your account/i,
-      /dear customer|dear user|dear student/i,
+      /student account|school account|your account|cuenta|compte/i,
+      /dear customer|dear user|dear student|estimado cliente|cher client/i,
       /unusual (?:activity|sign[- ]?in)|we detected/i
     ],
     explain: "The message borrows a trusted identity while giving you little independently verifiable context."
@@ -43,7 +44,7 @@ const SIGNAL_DEFINITIONS = [
     icon: "card",
     weight: 24,
     patterns: [
-      /gift card|wire transfer|bitcoin|crypto|payment|refund|invoice|prize|reward|cash|fee/i,
+      /gift card|wire transfer|bitcoin|crypto|payment|refund|invoice|prize|reward|cash|fee|tarjeta regalo|carte cadeau/i,
       /send (?:me|us)|purchase|buy now/i
     ],
     explain: "Unexpected money, refunds, prizes, and payment demands are common social-engineering hooks."
@@ -81,12 +82,18 @@ function cleanText(value, limit = 4000) {
   return typeof value === "string" ? value.replace(/\s+/g, " ").trim().slice(0, limit) : "";
 }
 
+function cleanRaw(value, limit = 12000) {
+  return typeof value === "string" ? value.replace(/\u0000/g, "").trim().slice(0, limit) : "";
+}
+
 function normalizeInput(rawInput) {
   const raw = typeof rawInput === "string" ? { message: rawInput } : rawInput || {};
   return {
     message: cleanText(raw.message),
     sender: cleanText(raw.sender, 160),
     claimedBrand: cleanText(raw.claimedBrand, 80),
+    headers: cleanRaw(raw.headers),
+    qrValue: cleanText(raw.qrValue, 2000),
     channel: ["Email", "Text message", "Chat", "Other"].includes(raw.channel) ? raw.channel : "Email",
     profile: ["Student", "Parent / caregiver", "School staff", "General user"].includes(raw.profile) ? raw.profile : "Student"
   };
@@ -120,6 +127,50 @@ function domainFitsBrand(domain, brand) {
   return BRAND_DOMAINS[brand].some((expected) => expected.startsWith(".") ? domain.endsWith(expected) : domain === expected || domain.endsWith(`.${expected}`));
 }
 
+export function parseEmailHeaders(rawHeaders) {
+  const source = cleanRaw(rawHeaders);
+  if (!source) return { provided: false, checks: [], from: "", replyTo: "", caveat: "No email headers were supplied." };
+  const lines = source.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  const checks = [];
+  const addCheck = (name, status, detail) => checks.push({
+    name,
+    status,
+    detail: `${detail} Reported by pasted headers; PhishLens does not independently verify authentication.`
+  });
+  const authText = lines.filter((line) => /^(authentication-results|received-spf|arc-authentication-results):/i.test(line)).join(" ");
+  for (const name of ["spf", "dkim", "dmarc"]) {
+    const match = authText.match(new RegExp(`${name}\\s*=\\s*(pass|fail|softfail|neutral|none|temperror|permerror)`, "i"));
+    if (match) addCheck(name.toUpperCase(), match[1].toLowerCase(), `The header reports ${name.toUpperCase()} ${match[1].toLowerCase()}.`);
+  }
+  const dkimPresent = lines.some((line) => /^dkim-signature:/i.test(line));
+  if (!checks.some((check) => check.name === "DKIM") && dkimPresent) addCheck("DKIM", "present", "A DKIM-Signature header is present, but no result was supplied.");
+  const from = lines.find((line) => /^from:/i.test(line))?.replace(/^from:\s*/i, "") || "";
+  const replyTo = lines.find((line) => /^reply-to:/i.test(line))?.replace(/^reply-to:\s*/i, "") || "";
+  const fromDomain = getSenderDomain(from);
+  const replyDomain = getSenderDomain(replyTo);
+  if (fromDomain && replyDomain && rootDomain(fromDomain) !== rootDomain(replyDomain)) {
+    addCheck("Reply-To", "review", `Reply-To domain ${replyDomain} differs from From domain ${fromDomain}.`);
+  }
+  return {
+    provided: true,
+    checks,
+    from,
+    replyTo,
+    caveat: "Authentication results are evidence reported by the mail system that supplied the headers, not an independent guarantee of sender identity."
+  };
+}
+
+function encodedDestination(raw, parsed) {
+  const authority = raw.match(/^https?:\/\/([^/?#]+)/i)?.[1] || "";
+  const rawHost = authority.replace(/^[^@]*@/, "").split(":")[0].replace(/^\[|\]$/g, "");
+  return Boolean(
+    parsed.username ||
+    parsed.password ||
+    /%(?:25|2f|2e|3a|40|5c)/i.test(raw) ||
+    /[^\x00-\x7f]/.test(rawHost)
+  );
+}
+
 function extractUrls(text) {
   return [...text.matchAll(URL_PATTERN)].map((match) => {
     const raw = match[0].replace(/[.,!?;:]+$/, "");
@@ -133,9 +184,12 @@ function extractUrls(text) {
       if (host.includes("xn--")) flags.push("look-alike domain encoding");
       if ([...SUSPICIOUS_TLDS].some((tld) => host.endsWith(tld))) flags.push("uncommon high-risk domain ending");
       if (host.split(".").length >= 5) flags.push("unusually deep subdomain chain");
+      if (parsed.port && !["80", "443"].includes(parsed.port)) flags.push(`unusual port ${parsed.port}`);
+      if (encodedDestination(raw, parsed)) flags.push("encoded or deceptive destination syntax");
       return {
         raw,
         host,
+        port: parsed.port || (parsed.protocol === "https:" ? "443" : "80"),
         rootDomain: rootDomain(host),
         flags,
         verdict: flags.length ? "Review before opening" : "Parsed only — not opened"
@@ -193,19 +247,20 @@ export function analyzePayload(rawInput) {
   const input = normalizeInput(rawInput);
   if (!input.message) throw new Error("Paste a message before scanning.");
 
-  const urls = extractUrls(input.message);
+  const analysisText = [input.message, input.qrValue ? `QR code contents: ${input.qrValue}` : ""].filter(Boolean).join("\n");
+  const urls = extractUrls(analysisText);
   const signals = [];
   let score = 4;
 
   for (const definition of SIGNAL_DEFINITIONS) {
-    const evidence = firstMatch(input.message, definition.patterns);
+    const evidence = firstMatch(analysisText, definition.patterns);
     if (!evidence) continue;
     score += definition.weight;
     signals.push({ ...definition, evidence });
   }
 
   const senderDomain = getSenderDomain(input.sender);
-  const brand = brandKey(input.claimedBrand || input.message);
+  const brand = brandKey(input.claimedBrand || analysisText);
   if (input.claimedBrand && senderDomain && !domainFitsBrand(senderDomain, brand)) {
     score += 22;
     signals.push({
@@ -219,12 +274,12 @@ export function analyzePayload(rawInput) {
   }
 
   for (const url of urls) {
-    const urlBrand = brandKey(input.claimedBrand || input.message);
+    const urlBrand = brandKey(input.claimedBrand || analysisText);
     if (urlBrand && !domainFitsBrand(url.host, urlBrand)) url.flags.push(`does not match claimed ${urlBrand} domain`);
     if (senderDomain && url.rootDomain && rootDomain(senderDomain) !== url.rootDomain) url.flags.push("destination differs from the sender domain");
     url.flags = [...new Set(url.flags)];
     if (url.flags.length) {
-      const highRiskDestination = url.flags.some((flag) => /numeric host|look-alike|high-risk domain/.test(flag));
+      const highRiskDestination = url.flags.some((flag) => /numeric host|look-alike|high-risk domain|encoded|unusual port/.test(flag));
       const weight = highRiskDestination ? 32 : 16;
       score += weight;
       signals.push({
@@ -238,6 +293,21 @@ export function analyzePayload(rawInput) {
     }
   }
 
+  const headerAnalysis = parseEmailHeaders(input.headers);
+  for (const check of headerAnalysis.checks) {
+    if (!["fail", "softfail", "permerror", "temperror", "review"].includes(check.status)) continue;
+    const weight = check.name === "Reply-To" ? 34 : 16;
+    score += weight;
+    signals.push({
+      id: "header-authentication",
+      label: `${check.name} header needs review`,
+      icon: "mail",
+      weight,
+      evidence: `${check.name}: ${check.status}`,
+      explain: check.detail
+    });
+  }
+
   score = Math.min(98, score);
   const severity = severityFor(score);
   const signalIds = signals.map((signal) => signal.id);
@@ -247,19 +317,21 @@ export function analyzePayload(rawInput) {
     : "Thanks for the note. I’ll verify this independently through an official channel before taking action.";
 
   return {
-    version: "0.3.0",
+    version: "0.4.0",
     input: { ...input, senderDomain },
     caseId: caseId(input),
     score,
     severity,
     signals,
     urls,
+    headers: headerAnalysis,
+    qr: input.qrValue ? { provided: true, value: input.qrValue, linksFound: extractUrls(input.qrValue).length } : { provided: false, value: "", linksFound: 0 },
     evidenceCoverage: {
       observedFactors,
       label: `${observedFactors} observed factor${observedFactors === 1 ? "" : "s"}`,
       note: "This is an evidence count, not a probability or an accuracy claim."
     },
-    triageNotice: "PhishLens is a safety triage tool. It recommends safer verification; it does not prove that a message is fraudulent.",
+    triageNotice: "PhishLens is a safety triage tool. It recommends safer verification; it does not prove that a message is fraudulent. Header results are reported evidence, not independent verification.",
     safeSteps: safeSteps(signalIds, urls, input.profile),
     safeReply: reply,
     resilience: resilienceSignals(signals),
@@ -291,6 +363,7 @@ export function reportText(result) {
     `Channel: ${context.channel}`,
     `Sender supplied: ${context.sender || "Not provided"}`,
     `Claimed organization: ${context.claimedBrand || "Not provided"}`,
+    `Email headers supplied: ${result.headers?.provided ? "Yes" : "No"}`,
     "",
     "SUMMARY",
     result.severity.summary,
@@ -303,6 +376,7 @@ export function reportText(result) {
     "",
     "REDACTED MESSAGE COPY",
     result.report.redactedMessage,
+    ...(result.qr?.provided ? ["", "QR CONTENT (provided locally)", redactForReport(result.qr.value)] : []),
     "",
     "SAFETY NOTE",
     "This local report was generated for verification and reporting support. It does not prove fraud and does not send anything automatically."
@@ -336,6 +410,21 @@ export const EVALUATION_SCENARIOS = [
   { id: "payment-credential", expected: "High risk", input: { channel: "Email", message: "Urgent refund confirmation: verify your account and password immediately to receive payment." } }
 ];
 
+export const ADVERSARIAL_SCENARIOS = [
+  { id: "polite-rewrite", expected: "Needs review", input: { channel: "Email", message: "When convenient, could you verify your student account information through this sign-in request?" } },
+  { id: "misspelled-urgency", expected: "Needs review", input: { channel: "Text message", message: "URGNT: act n0w to verify your p@ssw0rd or lose access." } },
+  { id: "unicode-lookalike", expected: "Needs review", input: { channel: "Email", message: "Please review the secure notice at https://xn--paypa1-9za.example/login." } },
+  { id: "encoded-path", expected: "Needs review", input: { channel: "Text message", message: "Open the account notice at https://example.com/%2f%2flogin%2fverify." } },
+  { id: "unusual-port", expected: "Needs review", input: { channel: "Email", message: "Your document is waiting at https://school.example:8443/verify." } },
+  { id: "spanish-credential", expected: "High risk", input: { channel: "Text message", message: "URGENTE: verifica la contraseña de tu cuenta inmediatamente o perderás el acceso." } },
+  { id: "french-payment", expected: "High risk", input: { channel: "Chat", message: "Cher client, envoyez une carte cadeau maintenant pour recevoir votre remboursement." } },
+  { id: "voice-clone-rewrite", expected: "Needs review", input: { channel: "Text message", message: "I sound like your coach, but please buy gift cards right now and keep this private." } },
+  { id: "image-ocr-login", expected: "High risk", input: { channel: "Other", message: "Screenshot OCR: security team detected unusual sign-in. Verify your password immediately at https://account.example/login." } },
+  { id: "benign-encoded-text", expected: "Lower risk", input: { channel: "Chat", message: "The art club poster uses a QR code for the room map; ask the organizer if you need help." } },
+  { id: "header-failure", expected: "High risk", input: { channel: "Email", sender: "alerts@school.example", claimedBrand: "School", headers: "Authentication-Results: mx; spf=fail dkim=fail dmarc=fail", message: "Please review the new attendance notice in the portal." } },
+  { id: "reply-to-divergence", expected: "Needs review", input: { channel: "Email", headers: "From: Office <office@school.example>\nReply-To: help@external.example", message: "Please reply to confirm the meeting time." } }
+];
+
 export function runScenarioEvaluation() {
   const cases = EVALUATION_SCENARIOS.map((scenario) => {
     const result = analyzePayload(scenario.input);
@@ -355,3 +444,88 @@ export function runScenarioEvaluation() {
     note: "These are curated behavior checks, not a real-world accuracy benchmark or a claim of model performance."
   };
 }
+
+function safeMetric(numerator, denominator) {
+  return denominator ? Number((numerator / denominator).toFixed(3)) : null;
+}
+
+export function runDatasetEvaluation() {
+  const scenarios = [...EVALUATION_SCENARIOS, ...ADVERSARIAL_SCENARIOS];
+  const cases = scenarios.map((scenario) => {
+    const result = analyzePayload(scenario.input);
+    return {
+      id: scenario.id,
+      expected: scenario.expected,
+      actual: result.severity.label,
+      passed: scenario.expected === result.severity.label,
+      observedFactors: result.evidenceCoverage.observedFactors
+    };
+  });
+  const truePositive = cases.filter((item) => item.expected !== "Lower risk" && item.actual !== "Lower risk").length;
+  const trueNegative = cases.filter((item) => item.expected === "Lower risk" && item.actual === "Lower risk").length;
+  const falsePositive = cases.filter((item) => item.expected === "Lower risk" && item.actual !== "Lower risk").length;
+  const falseNegative = cases.filter((item) => item.expected !== "Lower risk" && item.actual === "Lower risk").length;
+  const positiveExpected = truePositive + falseNegative;
+  return {
+    label: `${cases.length}-case deterministic safety dataset`,
+    passed: cases.filter((item) => item.passed).length,
+    total: cases.length,
+    accuracy: safeMetric(truePositive + trueNegative, cases.length),
+    precision: safeMetric(truePositive, truePositive + falsePositive),
+    recall: safeMetric(truePositive, positiveExpected),
+    falsePositiveRate: safeMetric(falsePositive, trueNegative + falsePositive),
+    confusion: { truePositive, trueNegative, falsePositive, falseNegative },
+    cases,
+    note: "This is a transparent synthetic/adversarial behavior dataset. It is not a consented real-world accuracy benchmark and should not be reported as one."
+  };
+}
+
+export function compareReviews(result, review = {}) {
+  const deterministicIds = result?.signals?.map((signal) => signal.id) || [];
+  const allowed = new Set(["urgency", "credential", "impersonation", "payment", "secrecy", "link", "sender-mismatch", "header-authentication"]);
+  const supplied = Array.isArray(review.signalIds) ? review.signalIds.filter((id) => allowed.has(id)) : [];
+  const text = [review.summary, ...(review.observations || [])].filter(Boolean).join(" ").toLowerCase();
+  const keywordMap = {
+    urgency: ["urgent", "urgency", "pressure", "immediately", "deadline"],
+    credential: ["password", "credential", "account", "sign in", "verification"],
+    impersonation: ["impersonat", "trusted identity", "support team", "fake brand"],
+    payment: ["payment", "gift card", "money", "refund", "prize"],
+    secrecy: ["private", "secret", "isolation", "do not tell"],
+    link: ["link", "domain", "destination", "url"],
+    "sender-mismatch": ["sender", "domain mismatch", "identity mismatch"],
+    "header-authentication": ["spf", "dkim", "dmarc", "header"]
+  };
+  const derived = Object.entries(keywordMap).filter(([, words]) => words.some((word) => text.includes(word))).map(([id]) => id);
+  const aiIds = [...new Set(supplied.length ? supplied : derived)];
+  const deterministic = [...new Set(deterministicIds)];
+  const sharedSignals = deterministic.filter((id) => aiIds.includes(id));
+  const deterministicOnly = deterministic.filter((id) => !aiIds.includes(id));
+  const aiOnly = aiIds.filter((id) => !deterministic.includes(id));
+  const agreement = sharedSignals.length && !deterministicOnly.length && !aiOnly.length
+    ? "Aligned"
+    : sharedSignals.length
+      ? "Partially aligned"
+      : "Different signal emphasis";
+  return {
+    agreement,
+    deterministicSignals: deterministic,
+    aiSignals: aiIds,
+    sharedSignals,
+    deterministicOnly,
+    aiOnly,
+    note: "The deterministic engine remains the primary safety trace. AI output is a second opinion and is never treated as a verdict."
+  };
+}
+
+export const PILOT_PROTOCOL = {
+  title: "PhishLens consent-first pilot",
+  consentRequired: true,
+  rawMessagesStored: false,
+  measures: [
+    "time to first safety decision",
+    "whether the participant chooses independent verification",
+    "understanding of the evidence trail",
+    "false-alarm or missed-warning feedback"
+  ],
+  protocol: "Use only synthetic or participant-provided messages with explicit consent. Record anonymous event timings and ratings locally, then export a summary for review. Do not collect names, contact details, or original messages."
+};

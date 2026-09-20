@@ -22,13 +22,17 @@ PhishLens turns a pasted email, text, or chat message into an explainable safety
 
 The product does not open pasted links. It parses a URL locally and says what needs attention, such as a shortener, numeric host, look-alike encoding, high-risk domain ending, sender/destination mismatch, or claimed-brand mismatch. It then gives audience-aware next steps for students, parents/caregivers, school staff, and general users, as well as a redacted local report and a safe reply. Nothing is sent automatically.
 
-An optional local Ollama review adds a constrained second opinion for semantic patterns that simple rules may not capture. If the local model is unavailable, PhishLens explicitly says so and retains the deterministic evidence result—no silent fallback to an unverified AI claim.
+PhishLens also makes harder cases inspectable. A user can preview a suspicious screenshot locally, decode a QR value when the browser supports local barcode detection, or paste OCR text; the decoded destination is analyzed without being opened. Email users can paste SPF, DKIM, and DMARC results, including a visible caveat that these are reported headers rather than independent verification. The URL parser also surfaces unusual ports, encoded/deceptive destinations, IDN/punycode look-alikes, shorteners, and sender/domain mismatch.
+
+An optional local Ollama review adds a constrained second opinion for semantic patterns that simple rules may not capture. The interface compares the deterministic signal set with the AI signal set so agreement and disagreement are visible. If the local model is unavailable, PhishLens explicitly says so and retains the deterministic evidence result—no silent fallback to an unverified AI claim.
+
+The product includes a guided 90-second judge mode, a consent-first redacted handoff for caregivers/teachers/school IT, accessibility controls for larger text, contrast, reduced motion, and plain-language reading, and a local ethical pilot mode. The pilot mode records anonymous timing and outcome choices only in memory and exports a summary without the original message. Its local dogfood output is labelled as n=1 and is not presented as a representative user study.
 
 ### How we built it
 
 The prototype uses vanilla HTML, CSS, JavaScript modules, and a small Node.js server. The core analysis engine runs in the browser and is shared with the server-side demo endpoint. The optional AI review connects only to a local Ollama endpoint; it treats every pasted message as untrusted content, requests a compact JSON triage response, blocks scam-generation tasks in its prompt, and never exposes chain-of-thought.
 
-We added a 24-case deterministic regression suite covering phishing, impersonation, payment, school, and benign-message cases. The user can run that check visibly in the interface. It is clearly presented as a curated behavior check, not as a claim of real-world model accuracy.
+We added a 36-case deterministic dataset: the original 24 curated cases plus adversarial checks for polite rewrites, misspellings, Unicode tricks, multilingual scams, voice-clone bait, image-text deception, unusual ports, QR-like destinations, and pasted email authentication results. The user can run that check visibly in the interface and see accuracy, precision, recall, and false-positive rate. It is clearly presented as a synthetic/adversarial behavior check, not as a claim of real-world model accuracy.
 
 ### Challenges we ran into
 
@@ -40,9 +44,10 @@ We also needed the AI layer to add value without becoming a privacy leak or a me
 
 - A judge can follow a complete safe workflow in under two minutes.
 - Every risk finding is evidence-linked instead of hidden behind a score.
-- PhishLens handles sender/brand and link-destination inconsistencies without opening a link.
+- PhishLens handles sender/brand and link-destination inconsistencies without opening a link, including encoded destinations and unusual ports.
 - It offers concrete next steps tailored to the person receiving the message.
-- The UI itself exposes a reproducible 24-case safety regression check.
+- The UI itself exposes reproducible behavior metrics and a visible deterministic-versus-AI comparison.
+- Screenshot/QR intake, email-header context, accessibility controls, and consent-first handoff make the safety flow useful beyond pasted plain text.
 - The tool is useful even without an AI model or an external service.
 
 ### What we learned
@@ -51,7 +56,7 @@ Cybersecurity UX is not only about detecting threats; it is about helping someon
 
 ### What's next for PhishLens
 
-The next iteration would add opt-in school reporting workflows, multilingual explanation packs, accessibility testing with student and caregiver participants, and a consent-first evaluation dataset with measurable false-positive and false-negative reporting. We would keep the current safety boundary: analyze locally whenever possible, never follow untrusted links, and do not treat a model output as proof.
+The next step is to run additional consented sessions with students, caregivers, and school staff using the built-in pilot protocol, then report participant-level results only after ethical review and sufficient sample size. The prototype already exports the measures needed—time to first decision, independent-verification choice, evidence understanding, and false-alarm feedback—without retaining original messages. We would keep the current safety boundary: analyze locally whenever possible, never follow untrusted links, and do not treat a model output as proof.
 
 ## Built with
 
@@ -65,9 +70,9 @@ The next iteration would add opt-in school reporting workflows, multilingual exp
 
 1. Run `npm run check` and `npm test`.
 2. Start the application with `npm run dev` and open `http://127.0.0.1:4173`.
-3. Load **School account**, click **Analyze safely**, and inspect the pressure points and locally parsed link.
-4. Click **Run 24-case safety check** to see the deterministic regression result.
-5. If Ollama is installed locally, click **Run local AI second opinion**. Otherwise the UI safely explains that the deterministic evidence result remains in use.
+3. Load **School account**, click **Analyze safely**, and inspect the pressure points, pasted header context, and locally parsed link.
+4. Click **Run 36-case safety check** to see the deterministic dataset metrics, or use **Run 90-second judge mode** for the guided proof flow.
+5. If Ollama is installed locally, click **Run local AI second opinion** and inspect the comparison panel. Otherwise the UI safely explains that the deterministic evidence result remains in use.
 
 ## Published project links
 

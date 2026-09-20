@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { extname, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { analyzePayload, runScenarioEvaluation } from "./src/analysis.mjs";
+import { analyzePayload, runDatasetEvaluation } from "./src/analysis.mjs";
 import { reviewWithOllama } from "./src/ai.mjs";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
@@ -96,7 +96,7 @@ const server = createServer(async (req, res) => {
       return;
     }
     if (req.method === "GET" && url.pathname === "/api/evaluate") {
-      sendJson(res, 200, runScenarioEvaluation());
+      sendJson(res, 200, runDatasetEvaluation());
       return;
     }
     if (req.method !== "GET" && req.method !== "HEAD") {

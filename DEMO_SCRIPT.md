@@ -1,4 +1,4 @@
-# PhishLens demo script — 2 minutes 20 seconds
+# PhishLens demo script — 2 minutes 50 seconds
 
 This script is intentionally below Devpost's five-minute limit. Record at 1440×900 or higher, keep the browser zoom at 100%, and use the seeded **School account** scenario for the main walkthrough.
 
@@ -32,28 +32,34 @@ This script is intentionally below Devpost's five-minute limit. Record at 1440×
 
 **Narration:** “The next move is practical: do not share a password, use the organization’s official route, ask a trusted adult or school contact, and keep a redacted local report if it needs to be reported. Nothing is sent automatically.”
 
-## 1:34–1:49 — Show semantic defense safely
+## 1:34–1:52 — Show semantic defense safely
 
 **On screen:** Click **Run local AI second opinion** and reveal the completed card.
 
 **Narration:** “For a second perspective, PhishLens can call a local Ollama model. It is constrained to defensive triage and clearly says when the local model is not available. The deterministic evidence engine always remains the foundation.”
 
-## 1:49–2:06 — Prove the behavior is checked
+## 1:52–2:15 — Show the hard cases and judge flow
 
-**On screen:** Click **Run 24-case safety check**; hold on the `24/24 expected scenarios passed` result.
+**On screen:** Expand **Inspect more evidence safely** to show the email-header and screenshot/QR paths, then click **Run 36-case safety check**. Hold on the `36/36 cases passed` result and its precision/recall/false-positive metrics.
 
-**Narration:** “We made safety behavior inspectable too. This visible regression suite checks 24 curated phishing, payment, impersonation, and benign scenarios. It is a behavior check, not a claim of real-world accuracy.”
+**Narration:** “We made the hard cases inspectable too: encoded destinations, misspellings, multilingual bait, QR and image text, and email authentication context. The 36-case behavior dataset reports transparent metrics for this synthetic test set, not real-world accuracy.”
 
-## 2:06–2:20 — Close
+## 2:15–2:35 — Consent-first workflow
+
+**On screen:** Show the redacted handoff preview and the consent checkbox; show the accessibility controls and pilot card briefly.
+
+**Narration:** “A student can export a redacted explanation to a trusted caregiver, teacher, or school IT contact only after consent. The pilot mode measures decision time and verification choices without storing the original message.”
+
+## 2:35–2:50 — Close
 
 **On screen:** Product promise: Explainable. Safe by design. Actionable.
 
-**Narration:** “PhishLens helps people slow down, understand the pressure, and take a safer next step—before a click becomes a compromise.”
+**Narration:** “Run 90-second judge mode to replay the whole proof: evidence, safe report, and behavior metrics. PhishLens helps people slow down, understand the pressure, and take a safer next step—before a click becomes a compromise.”
 
 ## Recording checklist
 
 - Use only synthetic or redacted sample messages.
 - Do not demonstrate opening a suspicious URL or entering credentials.
 - If the local model is not installed, show the explicit fallback rather than editing around it.
-- End with the regression-check result and product promise.
+- End with the 36-case metrics and product promise.
 - Upload the finished video as **unlisted** or public and add its URL to `DEVPOST_SUBMISSION.md`.

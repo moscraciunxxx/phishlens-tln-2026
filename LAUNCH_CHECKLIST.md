@@ -7,7 +7,10 @@
 - [x] Evidence coverage replaces a misleading confidence or accuracy claim.
 - [x] Audience-aware safe next steps, copy-safe response, and a redacted local report.
 - [x] Optional constrained local AI second opinion with an explicit fallback.
-- [x] Visible 24-case deterministic safety regression check.
+- [x] Screenshot/QR inspection path and pasted SPF/DKIM/DMARC context with caveats.
+- [x] Deterministic-versus-AI comparison, multilingual/adversarial regression coverage, and accessibility controls.
+- [x] Consent-first redacted school handoff, ethical pilot mode, and 90-second judge flow.
+- [x] Visible 36-case deterministic safety dataset with precision/recall/false-positive reporting.
 - [x] Under-five-minute demo script and Devpost-ready narrative.
 - [x] Local checks: `npm run check`, `npm test`, and `npm run evaluate`.
 
@@ -18,7 +21,7 @@
 
 ## Public submission assets — stage, then verify
 
-- [ ] Record the demo using `DEMO_SCRIPT.md`; keep it under five minutes.
+- [ ] Record the updated demo using `DEMO_SCRIPT.md`; keep it under five minutes.
 - [ ] Publish or create an accessible video URL.
 - [ ] Create a public source-code repository, then replace the placeholder in `DEVPOST_SUBMISSION.md`.
 - [ ] Optionally deploy the static browser build and add a live URL.

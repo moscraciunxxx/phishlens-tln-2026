@@ -23,7 +23,11 @@ Many scams succeed by rushing people into a decision before they can verify the 
 - Choose a built-in scenario such as **School account**, **Package text**, or **Voice-clone bait**.
 - Select **Analyze safely** to see every observed factor, its evidence, and the recommended next move.
 - Select **Run local AI second opinion** to request an optional, constrained semantic review from a local Ollama instance. If it is unavailable, the app clearly keeps the deterministic evidence result rather than pretending the model ran.
-- Select **Run 24-case safety check**. The visible suite validates expected behavior for curated phishing, impersonation, payment, and benign-message scenarios. It is intentionally labelled as a regression check, not a real-world accuracy benchmark.
+- Expand **Inspect more evidence safely** to preview a screenshot locally, decode a QR code when the browser exposes `BarcodeDetector`, paste email headers, or supply screenshot/OCR text. Destinations are parsed without opening them; SPF/DKIM/DMARC results are shown with their verification limits.
+- Select **Run local AI second opinion** and inspect the comparison panel: shared signals, deterministic-only signals, and AI-only emphasis are visible instead of being blended into a hidden verdict.
+- Select **Run 36-case safety check**. The visible suite includes benign, multilingual, misspelled, QR/image-text, header, and adversarial behavior cases. It reports precision, recall, and false-positive rate for this synthetic/adversarial dataset, not real-world accuracy.
+- Select **Run 90-second judge mode** for a guided judge-operable flow from one representative scenario to its redacted report and the behavior metrics.
+- Try the consent-first school handoff and ethical pilot panels. Handoffs require explicit consent and stay local; the pilot exports only anonymous timing/outcome summaries and clearly labels the local dogfood limitation.
 
 ## Safety and privacy boundaries
 
@@ -38,7 +42,7 @@ Many scams succeed by rushing people into a decision before they can verify the 
 ```text
 Browser UI
   ├─ public/engine.mjs        deterministic evidence engine + report builder
-  ├─ public/app.js            accessible interaction, local fallback, download flow
+  ├─ public/app.js            accessible interaction, screenshot/QR intake, judge and pilot flows
   └─ /api/analyze             same analysis engine for the local Node demo
         └─ /api/ai-review     optional localhost-only Ollama semantic review
 ```
@@ -57,7 +61,7 @@ npm run dev
 
 Open [http://127.0.0.1:4173](http://127.0.0.1:4173).
 
-To print the curated evaluation result:
+To print the transparent evaluation result:
 
 ```bash
 npm run evaluate
@@ -77,7 +81,7 @@ By default, PhishLens calls `http://127.0.0.1:11434/api/generate`. Set `PHISHLEN
 ## Submission materials
 
 - [Devpost-ready write-up](DEVPOST_SUBMISSION.md)
-- [2-minute demo script](DEMO_SCRIPT.md)
+- [under-five-minute demo script](DEMO_SCRIPT.md)
 - [Pre-submission checklist](LAUNCH_CHECKLIST.md)
 
 ### Static deployment
