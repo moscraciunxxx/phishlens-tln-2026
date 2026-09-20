@@ -26,7 +26,7 @@ PhishLens also makes harder cases inspectable. A user can preview a suspicious s
 
 An optional local Ollama review adds a constrained second opinion for semantic patterns that simple rules may not capture. The interface compares the deterministic signal set with the AI signal set so agreement and disagreement are visible. If the local model is unavailable, PhishLens explicitly says so and retains the deterministic evidence result—no silent fallback to an unverified AI claim.
 
-The product includes a guided 90-second judge mode, a consent-first redacted handoff for caregivers/teachers/school IT, accessibility controls for larger text, contrast, reduced motion, and plain-language reading, and a local ethical pilot mode. The pilot mode records anonymous timing and outcome choices only in memory and exports a summary without the original message. Its local dogfood output is labelled as n=1 and is not presented as a representative user study.
+The product includes a guided 90-second judge mode, a consent-first redacted handoff for caregivers/teachers/school IT, accessibility controls for larger text, contrast, reduced motion, and plain-language reading, and a local ethical pilot mode. The pilot mode records anonymous timing and outcome choices only in memory and exports a summary without the original message. One explicitly consented synthetic-content dogfood session was completed: n=1, two recorded outcomes, one independent-verification choice, one feedback choice, and about 94.7 seconds average time to outcome. These are descriptive local measures, not a representative user study or an accuracy claim.
 
 ### How we built it
 
@@ -56,7 +56,7 @@ Cybersecurity UX is not only about detecting threats; it is about helping someon
 
 ### What's next for PhishLens
 
-The next step is to run additional consented sessions with students, caregivers, and school staff using the built-in pilot protocol, then report participant-level results only after ethical review and sufficient sample size. The prototype already exports the measures needed—time to first decision, independent-verification choice, evidence understanding, and false-alarm feedback—without retaining original messages. We would keep the current safety boundary: analyze locally whenever possible, never follow untrusted links, and do not treat a model output as proof.
+The next step is to run additional consented sessions with students, caregivers, and school staff using the built-in pilot protocol, then report participant-level results only after ethical review and sufficient sample size. The first local dogfood result is intentionally limited to n=1 and is not generalized. The prototype already exports the measures needed—time to first decision, independent-verification choice, evidence understanding, and false-alarm feedback—without retaining original messages. We would keep the current safety boundary: analyze locally whenever possible, never follow untrusted links, and do not treat a model output as proof.
 
 ## Built with
 

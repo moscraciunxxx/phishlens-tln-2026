@@ -27,7 +27,7 @@ Many scams succeed by rushing people into a decision before they can verify the 
 - Select **Run local AI second opinion** and inspect the comparison panel: shared signals, deterministic-only signals, and AI-only emphasis are visible instead of being blended into a hidden verdict.
 - Select **Run 36-case safety check**. The visible suite includes benign, multilingual, misspelled, QR/image-text, header, and adversarial behavior cases. It reports precision, recall, and false-positive rate for this synthetic/adversarial dataset, not real-world accuracy.
 - Select **Run 90-second judge mode** for a guided judge-operable flow from one representative scenario to its redacted report and the behavior metrics.
-- Try the consent-first school handoff and ethical pilot panels. Handoffs require explicit consent and stay local; the pilot exports only anonymous timing/outcome summaries and clearly labels the local dogfood limitation.
+- Try the consent-first school handoff and ethical pilot panels. Handoffs require explicit consent and stay local; the pilot exports only anonymous timing/outcome summaries. The first consented synthetic-content dogfood session is documented as n=1 in `PILOT_REPORT.md` and is not generalized.
 
 ## Safety and privacy boundaries
 

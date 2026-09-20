@@ -1,0 +1,12 @@
+{
+  "protocol": "PhishLens consent-first pilot",
+  "participantCount": 1,
+  "outcomeCount": 2,
+  "independentVerificationCount": 1,
+  "feedbackCount": 1,
+  "independentVerificationRate": 0.5,
+  "averageTimeToOutcomeMs": 94688,
+  "rawMessagesStored": false,
+  "contentType": "synthetic",
+  "limitation": "Local dogfood session only; n=1 is not a representative user study. Run additional consented sessions before making population-level claims."
+}
