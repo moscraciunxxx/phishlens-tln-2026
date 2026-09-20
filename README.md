@@ -75,6 +75,10 @@ By default, PhishLens calls `http://127.0.0.1:11434/api/generate`. Set `PHISHLEN
 - [2-minute demo script](DEMO_SCRIPT.md)
 - [Pre-submission checklist](LAUNCH_CHECKLIST.md)
 
+### Static deployment
+
+The `public/` directory is self-contained and has been verified through a plain static web server: when the Node API is absent, the browser explicitly switches to its local analysis fallback. A GitHub Pages workflow at `.github/workflows/deploy-pages.yml` publishes that directory after GitHub Pages is configured to use **GitHub Actions** for the public repository. This creates an accessible demo without exposing the optional local AI service.
+
 ## AI and tool disclosure
 
 OpenAI Codex assisted the team in designing and implementing this prototype. PhishLens also includes an optional product feature that asks a **local** Ollama model for a constrained second opinion; it does not require an external AI API key. The deterministic evidence engine, the visible evaluation suite, and the no-link-opening boundary work without that model.
