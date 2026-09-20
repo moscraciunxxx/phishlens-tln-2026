@@ -69,11 +69,11 @@ The next iteration would add opt-in school reporting workflows, multilingual exp
 4. Click **Run 24-case safety check** to see the deterministic regression result.
 5. If Ollama is installed locally, click **Run local AI second opinion**. Otherwise the UI safely explains that the deterministic evidence result remains in use.
 
-## Links to add before final submission
+## Published project links
 
-- Demo video: `[add published video URL]`
-- Source code: `[add public repository URL]`
-- Optional live static demo: `[add URL if deployed]`
+- Demo video: https://youtu.be/SRyd-WwHj_4
+- Source code: https://github.com/moscraciunxxx/phishlens-tln-2026
+- Live static demo: https://moscraciunxxx.github.io/phishlens-tln-2026/
 
 ## Required AI disclosure
 

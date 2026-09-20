@@ -2,6 +2,9 @@
 
 PhishLens is an offline-first phishing and scam triage prototype built for the TLN Cybersecurity Challenge 2026. It helps a student, caregiver, school staff member, or general user pause before acting on a suspicious email, text, or chat message.
 
+- **Live demo:** https://moscraciunxxx.github.io/phishlens-tln-2026/
+- **Demo video:** https://youtu.be/SRyd-WwHj_4
+
 Instead of claiming to know whether a message is fraudulent, PhishLens makes the observable evidence inspectable: urgency pressure, credential requests, impersonation cues, payment bait, secrecy, sender/brand mismatches, and suspicious destinations. It never opens a pasted link.
 
 ![PhishLens screenshot](assets/phishlens-thumbnail.jpg)
