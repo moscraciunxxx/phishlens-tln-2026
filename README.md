@@ -4,6 +4,8 @@ PhishLens is an offline-first phishing and scam triage prototype built for the T
 
 Instead of claiming to know whether a message is fraudulent, PhishLens makes the observable evidence inspectable: urgency pressure, credential requests, impersonation cues, payment bait, secrecy, sender/brand mismatches, and suspicious destinations. It never opens a pasted link.
 
+![PhishLens screenshot](assets/phishlens-thumbnail.jpg)
+
 ## Why it matters
 
 Many scams succeed by rushing people into a decision before they can verify the request. PhishLens turns that moment into a short, safer workflow:
